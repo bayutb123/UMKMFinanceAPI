@@ -40,12 +40,6 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \Illuminate\Auth\Middleware\Authenticate::class,
-            \Illuminate\Auth\Middleware\Authorize::class,
-            \Illuminate\Auth\Middleware\EnsureTokenIsVerified::class,
-            \Illuminate\Auth\Middleware\EnsureTwoFactorIsEnabled::class,
-            \Illuminate\Auth\Middleware\VerifyCsrfToken::class,
         ],
     ];
 
