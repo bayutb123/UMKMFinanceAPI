@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->only(['email', 'password']);
+        $validated = $request->validated();
 
-        if (!auth()->attempt($credentials)) {
+        if (!auth()->attempt($validated)) {
             return response()->json([
                 'api_status' => '401',
                 'message' => 'Unauthorized',
@@ -30,9 +32,11 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $user = User::create($request->all());
+        $validated = $request->validated();
+        
+        $user = User::create($validated);
 
         return response()->json([
             'api_status' => '200',
