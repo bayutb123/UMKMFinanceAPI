@@ -36,12 +36,25 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
         
-        $user = User::create($validated);
+        if (User::isValid($validated['email'])) {
+            return response()->json([
+                'api_status' => '409',
+                'message' => 'Email already exist',
+            ], 409);
+        } else {
+            $user = User::create($validated);
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'api_status' => '201',
+                'message' => 'Created',
+                'user' => $user,
+                'token' => $token,
+            ], 201);
+        }
 
         return response()->json([
-            'api_status' => '200',
-            'message' => 'User Created',
-            'user' => $user,
-        ], 200);
+            'api_status' => '500',
+            'message' => 'Internal Server Error',
+        ], 500);
     }
 }

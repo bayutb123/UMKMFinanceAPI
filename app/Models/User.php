@@ -46,4 +46,13 @@ class User extends Authenticatable
         'created_at' => 'datetime',
         'password' => 'hashed',  
     ];
+
+    public static function isValid($email) {
+        $target = User::where('email', $email)->first();
+        if ($target != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
