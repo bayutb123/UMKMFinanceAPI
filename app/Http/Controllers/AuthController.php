@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\LogoutRequest;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -20,7 +22,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        if ($user) {
+        if ($user != null) {
             $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
                 'api_status' => '200',
@@ -61,4 +63,6 @@ class AuthController extends Controller
             'message' => 'Internal Server Error',
         ], 500);
     }
+
+
 }
