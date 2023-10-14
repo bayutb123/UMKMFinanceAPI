@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->integer('owner_id');
-            $table->string('name', 50)->unique();
+            $table->unsignedBigInteger('owner_id');
+            $table->string('name', 50);
             $table->string('description', 255);
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('owner_id')->references('id')->on('users');
         });
     }
 

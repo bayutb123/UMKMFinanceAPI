@@ -13,13 +13,17 @@ return new class extends Migration
     {
         Schema::create('book_inventory', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('owner_id');
             $table->date('date');
             $table->foreignId('product_id')->constrained();
             $table->integer('quantity');
-            $table->integer('price');
+            $table->integer('purchased_in_price')->default(0);
+            $table->integer('sold_in_price')->default(0);
             $table->foreignId('transaction_id')->constrained();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('owner_id')->references('id')->on('users');
         });
     }
 

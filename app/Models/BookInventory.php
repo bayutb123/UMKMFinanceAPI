@@ -12,9 +12,11 @@ class BookInventory extends Model
     protected $table = 'book_inventory';
     protected $fillable = [
         'date',
+        'owner_id',
         'product_id',
         'quantity',
-        'price',
+        'purchased_in_price',
+        'sold_in_price',
         'transaction_id'
     ];
 
