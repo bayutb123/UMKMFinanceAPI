@@ -6,6 +6,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\CustomerController;
+
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -19,3 +22,6 @@ Route::post('/transaction/purchase', [TransactionController::class, 'createPurch
 Route::post('/transaction/sale', [TransactionController::class, 'createSaleTransaction']);
 
 Route::post('/product/add', [ProductController::class, 'addProduct']);
+
+Route::post('/vendor/add', [VendorController::class, 'addVendor']);
+Route::post('/customer/add', [CustomerController::class, 'addCustomer']);

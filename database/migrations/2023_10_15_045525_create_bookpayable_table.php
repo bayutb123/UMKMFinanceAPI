@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('book_payable', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('owner_id');
+            $table->unsignedBigInteger('transaction_id');
             $table->date('transaction_date');
             $table->unsignedBigInteger('vendor_id');
             $table->integer('amount');
@@ -21,6 +23,8 @@ return new class extends Migration
             $table->softDeletes();
             
             $table->foreign('vendor_id')->references('id')->on('vendors');
+            $table->foreign('transaction_id')->references('id')->on('transactions');
+            $table->foreign('owner_id')->references('id')->on('users');
         });
     }
 

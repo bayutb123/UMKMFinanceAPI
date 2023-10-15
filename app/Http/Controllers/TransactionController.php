@@ -9,6 +9,9 @@ use App\Http\Requests\PurchaseRequest;
 use App\Http\Requests\SaleRequest;
 use App\Models\Product;
 use App\Models\BookInventory;
+use App\Models\BookReceivable;
+use App\Models\BookPayable;
+
 
 class TransactionController extends Controller
 {
@@ -63,7 +66,7 @@ class TransactionController extends Controller
                 'description' => $validated['description'],
                 'account_id' => $validated['account_id'],
                 'amount' => $validated['amount'],
-                'type' => 1
+                'type' => $validated['type']
             ]);
             $book_inventory = BookInventory::create(
                 [
@@ -75,10 +78,32 @@ class TransactionController extends Controller
                     'transaction_id' => $transaction->id
                 ]
                 );
-            return response()->json([
-                'transaction' => $transaction,
-                'book_inventory' => $book_inventory
-            ]);
+
+            if ($validated['type'] == 3) {
+                $book_payable = BookPayable::create(
+                    [
+                        'owner_id' => $validated['user_id'],
+                        'transaction_id' => $transaction->id,
+                        'transaction_date' => $validated['transaction_date'],
+                        'vendor_id' => $validated['vendor_id'],
+                        'amount' => $validated['amount'],
+                        'paid' => 0
+                    ]
+                );
+                return response()->json([
+                    'type' => 'Pembelian Kredit',
+                    'transaction' => $transaction,
+                    'book_inventory' => $book_inventory,
+                    'book_payable' => $book_payable,
+                ]);
+            }
+            return response()->json(
+                [
+                    'type' => 'Pembelian Tunai',    
+                    'transaction' => $transaction,
+                    'book_inventory' => $book_inventory,
+                ]
+            );
         }
         return response()->json(['error' => 'Validation failed'], 400);
     }
@@ -102,7 +127,7 @@ class TransactionController extends Controller
                 'description' => $validated['description'],
                 'account_id' => $validated['account_id'],
                 'amount' => $validated['amount'],
-                'type' => 2
+                'type' => $validated['type']
             ]);
             $book_inventory = BookInventory::create(
                 [
@@ -114,6 +139,23 @@ class TransactionController extends Controller
                     'transaction_id' => $transaction->id
                 ]
                 );
+            if ($validated['type'] == 4) {
+                $book_receivable = BookReceivable::create(
+                    [
+                        'owner_id' => $validated['user_id'],
+                        'transaction_id' => $transaction->id,
+                        'transaction_date' => $transaction->transaction_date,
+                        'customer_id' => $validated['customer_id'],
+                        'amount' => $validated['amount'],
+                        'paid' => 0
+                    ]
+                );
+                return response()->json([
+                    'transaction' => $transaction,
+                    'book_inventory' => $book_inventory,
+                    'book_receivable' => $book_receivable
+                ]);
+            }
             return response()->json([
                 'transaction' => $transaction,
                 'book_inventory' => $book_inventory

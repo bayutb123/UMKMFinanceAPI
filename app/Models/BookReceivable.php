@@ -11,13 +11,15 @@ class BookReceivable extends Model
 
     protected $table = 'book_receivable';
     protected $fillable = [
+        'owner_id',
+        'transaction_id',
         'transaction_date',
         'customer_id',
-        'amount_d',
-        'amount_k',
-        'amount'
+        'amount',
+        'paid'
     ];
 
+    
     protected $casts = [
         'transaction_date' => 'date'
     ];

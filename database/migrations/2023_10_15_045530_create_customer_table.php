@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('owner_id');
             $table->string('name', 100);
             $table->string('address', 100)->nullable();
+            $table->string('owner', 100)->nullable();
             $table->string('contact', 100)->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('owner_id')->references('id')->on('users');
         });
     }
 

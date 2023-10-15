@@ -11,11 +11,12 @@ class BookPayable extends Model
 
     protected $table = 'book_payable';
     protected $fillable = [
+        'owner_id',
+        'transaction_id',
         'transaction_date',
         'vendor_id',
-        'amount_d',
-        'amount_k',
-        'amount'
+        'amount',
+        'paid'
     ];
 
     protected $casts = [

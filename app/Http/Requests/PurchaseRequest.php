@@ -24,11 +24,13 @@ class PurchaseRequest extends FormRequest
         return [
             'transaction_date' => 'required|date',
             'user_id' => 'required|numeric',
+            'vendor_id' => 'required|numeric',
             'description' => 'required|string',
             'account_id' => 'required|numeric',
             'product_id' => 'required|numeric',
             'quantity' => 'required|numeric',
             'amount' => 'required|numeric',
+            'type' => 'required|integer',
         ];
     }
 }

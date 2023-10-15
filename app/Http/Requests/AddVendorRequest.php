@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class OutcomeRequest extends FormRequest
+class AddVendorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,11 @@ class OutcomeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            'owner_id' => 'required|numeric',
+            'name' => 'required|string|max:100',
+            'address' => 'nullable|string|max:100',
+            'owner' => 'nullable|string|max:100',
+            'contact' => 'nullable|string|max:100',
         ];
     }
 }
