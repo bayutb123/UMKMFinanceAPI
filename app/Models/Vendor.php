@@ -22,4 +22,9 @@ class Vendor extends Model
     {
         return $this->where('id', $id)->first();
     }
+
+    public function checkConflict($name, $owner_id)
+    {
+        return $this->where('name', $name)->where('owner_id', $owner_id)->first();
+    }
 }
