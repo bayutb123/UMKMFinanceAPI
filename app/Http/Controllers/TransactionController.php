@@ -151,12 +151,14 @@ class TransactionController extends Controller
                     ]
                 );
                 return response()->json([
+                    'type' => 'Penjualan Kredit',
                     'transaction' => $transaction,
                     'book_inventory' => $book_inventory,
                     'book_receivable' => $book_receivable
                 ]);
             }
             return response()->json([
+                'type' => 'Penjualan Tunai',
                 'transaction' => $transaction,
                 'book_inventory' => $book_inventory
             ]);
