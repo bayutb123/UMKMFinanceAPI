@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Requests\AddProductRequest;
+use App\Models\BookInventory;
 
 class ProductController extends Controller
 {
@@ -17,7 +18,9 @@ class ProductController extends Controller
                 ->first();
 
             if ($checkProduct != null) {
-                return response()->json(['error' => 'Product already exists'], 400);
+                return response()->json([
+                    'error' => 'Product already exists'
+                ], 400);
             }
 
             $product = Product::create($validated);
@@ -27,6 +30,40 @@ class ProductController extends Controller
                 ], 200
             );
         }
-        return response()->json(['error' => 'Validation failed'], 400);
+        return response()->json([
+            'error' => 'Validation failed'
+        ], 400);
     }
+
+    public function getProducts($userId) {
+        $products = Product::where('owner_id', $userId)
+        ->where('has_qty', 1)
+        ->get();
+        $res = [];
+
+        foreach ($products as $product) {
+            $item = BookInventory::where('product_id', $product->id)
+            ->where('owner_id', $userId)
+            ->first();
+            // sum item qty 
+            $item->quantity = BookInventory::where('product_id', $product->id)
+                ->where('owner_id', $userId)
+                ->sum('quantity');
+            $item->purchased_in_price = BookInventory::where('product_id', $product->id)
+                ->where('owner_id', $userId)
+                ->average('purchased_in_price');
+            if ($item->quantity > 0) {
+                array_push($res, $item);
+            }
+        }
+
+        return response()->json(
+            [
+                'total' => count($res),
+                'products' => $res,
+            ], 200
+        );
+    }
+
+    
 }

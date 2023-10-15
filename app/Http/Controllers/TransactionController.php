@@ -11,6 +11,8 @@ use App\Models\Product;
 use App\Models\BookInventory;
 use App\Models\BookReceivable;
 use App\Models\BookPayable;
+use App\Models\Vendor;
+use App\Models\Customer;
 
 
 class TransactionController extends Controller
@@ -56,8 +58,13 @@ class TransactionController extends Controller
                 ->where('owner_id', $validated['user_id'])
                 ->first();
 
+            $checkVendor = new Vendor;
+            $checkVendorImpl = $checkVendor->checkVendor($validated['vendor_id'], $validated['user_id']);
+
             if ($checkProduct == null) {
                 return response()->json(['error' => 'Product not found'], 400);
+            } else if($checkVendorImpl == null) {
+                return response()->json(['error' => 'Vendor not found'], 400);
             }
 
             $transaction = Transaction::create([
@@ -78,6 +85,16 @@ class TransactionController extends Controller
                     'transaction_id' => $transaction->id
                 ]
                 );
+            
+            $invenBook = new BookInventory;
+            $validate = $invenBook->checkIfHasQty($validated['user_id'], $validated['product_id']);
+            
+            if ($validate) {
+                Product::where('id', $validated['product_id'])
+                    ->where('owner_id', $validated['user_id'])
+                    ->update(['has_qty' => 1]);
+            }
+
 
             if ($validated['type'] == 3) {
                 $book_payable = BookPayable::create(
@@ -117,8 +134,13 @@ class TransactionController extends Controller
                 ->where('deleted_at', null)
                 ->sum('quantity');
 
+            $checkCustomer = new Customer;
+            $checkCustomerImpl = $checkCustomer->checkCustomer($validated['customer_id'], $validated['user_id']);
+
             if ($checkProduct < $validated['quantity']) {
                 return response()->json(['error' => 'Not enough product'], 400);
+            } else if($checkCustomerImpl == null) {
+                return response()->json(['error' => 'Customer not found'], 400);
             }
 
             $transaction = Transaction::create([

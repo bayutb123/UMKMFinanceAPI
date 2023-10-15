@@ -35,4 +35,16 @@ class BookInventory extends Model
             ->where('owner_id', $ownerId)
             ->get();
     }
+
+    public function checkIfHasQty($ownerId, $productId)
+    {
+        $item = $this->where('product_id', $productId)
+            ->where('owner_id', $ownerId)
+            ->first();
+        if ($item) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

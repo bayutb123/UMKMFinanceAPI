@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('description', 255);
             $table->boolean('active')->default(true);
+            $table->integer('has_qty')->default(false);
             $table->timestamps();
             $table->softDeletes();
 

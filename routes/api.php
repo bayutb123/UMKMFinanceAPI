@@ -25,3 +25,5 @@ Route::post('/product/add', [ProductController::class, 'addProduct']);
 
 Route::post('/vendor/add', [VendorController::class, 'addVendor']);
 Route::post('/customer/add', [CustomerController::class, 'addCustomer']);
+
+Route::get('/product/get/{id}', [ProductController::class, 'getProducts']);
