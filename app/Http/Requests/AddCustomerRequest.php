@@ -24,7 +24,7 @@ class AddCustomerRequest extends FormRequest
         return [
             'owner_id' => 'required|numeric',
             'name' => 'required|string|max:100',
-            'address' => 'nullable|string|max:100',
+            'address' => 'nullable|string',
             'owner' => 'nullable|string|max:100',
             'contact' => 'nullable|string|max:100',
         ];

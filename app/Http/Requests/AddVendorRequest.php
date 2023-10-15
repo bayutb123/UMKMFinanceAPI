@@ -23,9 +23,9 @@ class AddVendorRequest extends FormRequest
     {
         return [
             'owner_id' => 'required|numeric',
-            'name' => 'required|string|max:100',
-            'address' => 'nullable|string|max:100',
-            'owner' => 'nullable|string|max:100',
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string',
+            'owner' => 'nullable|string|max:255',
             'contact' => 'nullable|string|max:100',
         ];
     }

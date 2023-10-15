@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('owner_id');
             $table->string('name', 100);
-            $table->string('address', 100)->nullable();
+            $table->string('address')->nullable();
             $table->string('owner', 100)->nullable();
             $table->string('contact', 100)->nullable();
             $table->timestamps();
