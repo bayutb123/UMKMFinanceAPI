@@ -23,4 +23,16 @@ class BookInventory extends Model
     protected $cast = [
         'date' => 'date'
     ];
+
+    public function getItemByOwnerId($ownerId)
+    {
+        return $this->where('owner_id', $ownerId)->get();
+    }
+
+    public function getItemByProductId($ownerId, $productId)
+    {
+        return $this->where('product_id', $productId)
+            ->where('owner_id', $ownerId)
+            ->get();
+    }
 }
