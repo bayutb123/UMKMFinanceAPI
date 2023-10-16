@@ -16,8 +16,7 @@ Route::get('/user/{id}', [UserController::class, 'getUser']);
 Route::post('/user/edit', [UserController::class, 'edit']);
 
 Route::post('/transaction/create', [TransactionController::class, 'create']);
-Route::get('/transaction/incoming/{id}', [TransactionController::class, 'getIncoming']);
-Route::get('/transaction/outcoming/{id}', [TransactionController::class, 'getOutcoming']);
+Route::get('/transaction/all/{id}', [TransactionController::class, 'getAllTransactions']);
 
 Route::post('/transaction/purchase', [TransactionController::class, 'createPurchaseTransaction']);
 Route::post('/transaction/sale', [TransactionController::class, 'createSaleTransaction']);

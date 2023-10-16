@@ -28,28 +28,13 @@ class TransactionController extends Controller
         return response()->json(['error' => 'Validation failed'], 400);
     }
 
-    public function getIncoming($userId) {
-        $transactions = Transaction::where('user_id', $userId)
-            ->where('type', 1)
-            ->get();
-        return response()->json(
-            [
-                'transactions' => $transactions,
-                'total' => $transactions->count()
-            ], 200
-        );
-    }
-
-    public function getOutcoming($userId) {
-        $transactions = Transaction::where('user_id', $userId)
-            ->where('type', 2)
-            ->get();
-        return response()->json(
-            [
-                'transactions' => $transactions,
-                'total' => $transactions->count()
-            ], 200
-        );
+    public function getAllTransactions($userId) {
+        $transactions = Transaction::where('user_id', $userId)->get();
+        return response()->json([
+            'status' => '200',
+            'total' => count($transactions),
+            'transactions' => $transactions
+        ]);
     }
 
     public function createPurchaseTransaction(PurchaseRequest $request) {
