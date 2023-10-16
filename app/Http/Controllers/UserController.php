@@ -8,6 +8,27 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+
+    public function getUser($id) {
+        $user = User::where('id', $id)->first();
+        if ($user != null) {
+            return response()->json(
+                [
+                    'api_status' => '200',
+                    'message' => 'User Found',
+                    'user' => $user
+                ], 200
+            );
+        } else {
+            return response()->json(
+                [
+                    'api_status' => '404',
+                    'message' => 'User Not Found',
+                ], 404
+            );
+        }
+    }
+
     public function edit(EditUserRequest $request) {
 
         $validated = $request->validated();

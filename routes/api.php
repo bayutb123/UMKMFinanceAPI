@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerController;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
+Route::get('/user/{id}', [UserController::class, 'getUser']);
 Route::post('/user/edit', [UserController::class, 'edit']);
 
 Route::post('/transaction/create', [TransactionController::class, 'create']);
