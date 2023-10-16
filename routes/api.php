@@ -20,6 +20,8 @@ Route::get('/transaction/outcoming/{id}', [TransactionController::class, 'getOut
 
 Route::post('/transaction/purchase', [TransactionController::class, 'createPurchaseTransaction']);
 Route::post('/transaction/sale', [TransactionController::class, 'createSaleTransaction']);
+Route::post('/transaction/payment', [TransactionController::class, 'createPaymentTransaction']);
+Route::post('/transaction/receipt', [TransactionController::class, 'createReceiptTransaction']);
 
 Route::post('/product/add', [ProductController::class, 'addProduct']);
 

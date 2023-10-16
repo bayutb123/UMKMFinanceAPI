@@ -13,6 +13,8 @@ use App\Models\BookReceivable;
 use App\Models\BookPayable;
 use App\Models\Vendor;
 use App\Models\Customer;
+use App\Http\Requests\ReciptRequest;
+use App\Http\Requests\PaymentRequest;
 
 
 class TransactionController extends Controller
@@ -185,6 +187,92 @@ class TransactionController extends Controller
                 'book_inventory' => $book_inventory
             ]);
         }
+        return response()->json(['error' => 'Validation failed'], 400);
+    }
+
+    public function createPaymentTransaction(PaymentRequest $request) {
+        $validated = $request->validated();
+        if ($validated) {
+            $book_payable = BookPayable::where('transaction_id', $validated['transaction_id'])
+                ->where('owner_id', $validated['user_id'])
+                ->first();
+
+            if ($book_payable == null) {
+                return response()->json(['error' => 'Book payable not found'], 400);
+            }
+
+            $book_payable->paid_amount += $validated['amount'];
+            $book_payable->paid = $book_payable->paid_amount == $book_payable->amount ? 1 : 0;
+
+            if ($book_payable->paid == 1) {
+                $book_payable->paid_date = $validated['transaction_date'];
+            }
+
+            if ($book_payable->paid_amount > $book_payable->amount) {
+                return response()->json(['error' => 'Paid amount is more than payable amount'], 400);
+            }
+
+            $transaction = Transaction::create([
+                'transaction_date' => $validated['transaction_date'],
+                'user_id' => $validated['user_id'],
+                'description' => $validated['description'],
+                'account_id' => $validated['account_id'],
+                'amount' => $validated['amount'],
+                'type' => $validated['type']
+            ]);
+
+            $book_payable->save();
+
+            return response()->json([
+                'type' => 'Pembayaran Hutang',
+                'transaction' => $transaction,
+                'book_payable' => $book_payable
+            ]);
+        }
+
+        return response()->json(['error' => 'Validation failed'], 400);
+    }
+
+    public function createReceiptTransaction(ReciptRequest $request) {
+        $validated = $request->validated();
+        if ($validated) {
+            $book_receivable = BookReceivable::where('transaction_id', $validated['transaction_id'])
+                ->where('owner_id', $validated['user_id'])
+                ->first();
+
+            if ($book_receivable == null) {
+                return response()->json(['error' => 'Book receivable not found'], 400);
+            }
+
+            $book_receivable->paid_amount += $validated['amount'];
+            $book_receivable->paid = $book_receivable->paid_amount == $book_receivable->amount ? 1 : 0;
+
+            if ($book_receivable->paid == 1) {
+                $book_receivable->paid_date = $validated['transaction_date'];
+            }
+
+            if ($book_receivable->paid_amount > $book_receivable->amount) {
+                return response()->json(['error' => 'Paid amount is more than receivable amount'], 400);
+            }
+
+            $transaction = Transaction::create([
+                'transaction_date' => $validated['transaction_date'],
+                'user_id' => $validated['user_id'],
+                'description' => $validated['description'],
+                'account_id' => $validated['account_id'],
+                'amount' => $validated['amount'],
+                'type' => $validated['type']
+            ]);
+
+            $book_receivable->save();
+
+            return response()->json([
+                'type' => 'Pembayaran Piutang',
+                'transaction' => $transaction,
+                'book_receivable' => $book_receivable
+            ]);
+        }
+
         return response()->json(['error' => 'Validation failed'], 400);
     }
 }

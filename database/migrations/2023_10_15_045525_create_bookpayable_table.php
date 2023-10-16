@@ -18,7 +18,9 @@ return new class extends Migration
             $table->date('transaction_date');
             $table->unsignedBigInteger('vendor_id');
             $table->integer('amount');
+            $table->integer('paid_amount')->default(0);
             $table->integer('paid')->default(0);
+            $table->date('paid_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
             

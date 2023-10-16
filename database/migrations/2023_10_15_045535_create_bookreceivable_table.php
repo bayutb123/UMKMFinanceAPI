@@ -17,8 +17,10 @@ return new class extends Migration
             $table->unsignedBigInteger('transaction_id');
             $table->date('transaction_date');
             $table->unsignedBigInteger('customer_id');
-            $table->integer('paid')->default(0);
             $table->integer('amount');
+            $table->integer('paid_amount')->default(0);
+            $table->integer('paid')->default(0);
+            $table->date('paid_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
