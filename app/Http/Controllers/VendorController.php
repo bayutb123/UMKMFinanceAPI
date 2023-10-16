@@ -23,4 +23,28 @@ class VendorController extends Controller
             'vendor' => $vendor
         ], 200);
     }
+
+    public function getVendors($userId)
+    {
+        $vendors = Vendor::where('owner_id', $userId)->get();
+        return response()->json([
+            'total' => count($vendors),
+            'vendors' => $vendors
+        ], 200);
+    }
+
+    public function deleteVendor($vendorId)
+    {
+        $vendor = Vendor::where('id', $vendorId)->first();
+        if ($vendor != null) {
+            $vendor->delete();
+            return response()->json([
+                'message' => 'Vendor deleted successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'error' => 'Vendor not found'
+            ], 400);
+        }
+    }
 }

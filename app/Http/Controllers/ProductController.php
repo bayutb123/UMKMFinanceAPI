@@ -45,15 +45,17 @@ class ProductController extends Controller
             $item = BookInventory::where('product_id', $product->id)
             ->where('owner_id', $userId)
             ->first();
-            // sum item qty 
-            $item->quantity = BookInventory::where('product_id', $product->id)
-                ->where('owner_id', $userId)
-                ->sum('quantity');
-            $item->purchased_in_price = BookInventory::where('product_id', $product->id)
-                ->where('owner_id', $userId)
-                ->average('purchased_in_price');
-            if ($item->quantity > 0) {
-                array_push($res, $item);
+            if ($item != null) {
+                // sum item qty 
+                $item->quantity = BookInventory::where('product_id', $product->id)
+                    ->where('owner_id', $userId)
+                    ->sum('quantity');
+                $item->purchased_in_price = BookInventory::where('product_id', $product->id)
+                    ->where('owner_id', $userId)
+                    ->average('purchased_in_price');
+                if ($item->quantity > 0) {
+                    array_push($res, $item);
+                }
             }
         }
 
@@ -62,6 +64,23 @@ class ProductController extends Controller
                 'total' => count($res),
                 'products' => $res,
             ], 200
+        );
+    }
+
+    public function deleteProduct($id) {
+        $product = Product::find($id);
+        if ($product) {
+            $product->delete();
+            return response()->json(
+                [
+                    'message' => 'Product deleted successfully'
+                ], 200
+            );
+        }
+        return response()->json(
+            [
+                'error' => 'Product not found'
+            ], 404
         );
     }
 

@@ -28,6 +28,33 @@ class TransactionController extends Controller
         return response()->json(['error' => 'Validation failed'], 400);
     }
 
+    public function deleteTransaction($transactionId) {
+        $transaction = Transaction::where('id', $transactionId)->first();
+        if ($transaction != null) {
+            if ($transaction->type == 3) {
+                $book_payable = BookPayable::where('transaction_id', $transactionId)->first();
+                $book_inventory = BookInventory::where('transaction_id', $transactionId)->first();
+                $book_inventory->delete();
+                $book_payable->delete();
+            } else if ($transaction->type == 4) {
+                $book_receivable = BookReceivable::where('transaction_id', $transactionId)->first();
+                $book_inventory = BookInventory::where('transaction_id', $transactionId)->first();
+                $book_inventory->delete();
+                $book_receivable->delete();
+            }
+
+            
+            $transaction->delete();
+            return response()->json([
+                'message' => 'Transaction deleted successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'error' => 'Transaction not found'
+            ], 400);
+        }
+    }
+
     public function getAllTransactions($userId) {
         $transactions = Transaction::where('user_id', $userId)->get();
         return response()->json([

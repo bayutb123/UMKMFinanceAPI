@@ -22,4 +22,28 @@ class CustomerController extends Controller
             'customer' => $customer
         ], 200);
     }
+
+    public function getCustomers($userId)
+    {
+        $customers = Customer::where('owner_id', $userId)->get();
+        return response()->json([
+            'total' => count($customers),
+            'customers' => $customers
+        ], 200);
+    }
+
+    public function deleteCustomer($customerId)
+    {
+        $customer = Customer::where('id', $customerId)->first();
+        if ($customer != null) {
+            $customer->delete();
+            return response()->json([
+                'message' => 'Customer deleted successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'error' => 'Customer not found'
+            ], 400);
+        }
+    }
 }
