@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('book_inventory', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('owner_id');
+            $table->foreignId('transaction_id')->constrained();
             $table->date('date');
             $table->foreignId('product_id')->constrained();
-            $table->integer('quantity');
+            $table->integer('in')->default(0);
             $table->integer('purchased_in_price')->default(0);
+            $table->integer('out')->default(0); 
             $table->integer('sold_in_price')->default(0);
-            $table->foreignId('transaction_id')->constrained();
+            $table->integer('qty')->default(0);
             $table->timestamps();
             $table->softDeletes();
 

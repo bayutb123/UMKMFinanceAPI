@@ -16,10 +16,12 @@ class BookInventory extends Model
         'date',
         'owner_id',
         'product_id',
-        'quantity',
+        'in',
         'purchased_in_price',
+        'out',
         'sold_in_price',
-        'transaction_id'
+        'transaction_id',
+        'qty',
     ];
 
     protected $cast = [
