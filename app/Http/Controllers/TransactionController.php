@@ -19,7 +19,7 @@ use App\Http\Requests\PaymentRequest;
 
 class TransactionController extends Controller
 {
-    public function create(TransactionRequest $request) {
+    public function addTransaction(TransactionRequest $request) {
         $validated = $request->validated();
         if ($validated) {
             $transaction = Transaction::create($validated);
