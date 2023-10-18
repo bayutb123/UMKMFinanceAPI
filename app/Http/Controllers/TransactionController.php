@@ -8,6 +8,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Http\Requests\PurchaseRequest;
 use App\Http\Requests\SaleRequest;
 use App\Models\Product;
+use App\Models\TransactionInventory;
 use App\Models\BookInventory;
 use App\Models\BookReceivable;
 use App\Models\BookPayable;
@@ -31,16 +32,42 @@ class TransactionController extends Controller
     public function deleteTransaction($transactionId) {
         $transaction = Transaction::where('id', $transactionId)->first();
         if ($transaction != null) {
-            if ($transaction->type == 3) {
+            if ($transaction->type == 1 || $transaction->type == 3) {
                 $book_payable = BookPayable::where('transaction_id', $transactionId)->first();
                 $book_inventory = BookInventory::where('transaction_id', $transactionId)->first();
+                if ($book_inventory->qty != $book_inventory->in)
+                {
+                    return response()->json([
+                        'error' => 'Cannot delete transaction because product has been sold'
+                    ], 400);
+                } 
                 $book_inventory->delete();
-                $book_payable->delete();
-            } else if ($transaction->type == 4) {
+                if ($book_payable != null) {
+                    $book_payable->delete();
+                }
+            } else if ($transaction->type == 2 || $transaction->type == 4) {
                 $book_receivable = BookReceivable::where('transaction_id', $transactionId)->first();
-                $book_inventory = BookInventory::where('transaction_id', $transactionId)->first();
-                $book_inventory->delete();
-                $book_receivable->delete();
+                $quantity = TransactionInventory::where('transaction_id', $transactionId)->first()->quantity;
+                $inventory_id = TransactionInventory::where('transaction_id', $transactionId)->first()->inventory_id;
+                
+                for ($i = 0; $i < $quantity; $i++) {
+                    $book_inventory = BookInventory::where('owner_id', $transaction->user_id)
+                    ->where('id', $inventory_id)
+                    ->first();
+                    if ($book_inventory != null) {
+                        $book_inventory->out -= 1;
+                        $book_inventory->qty += 1;
+                        $book_inventory->save();
+                    }
+                }
+                if ($book_receivable != null) {
+                    if ($book_receivable->paid == 1) {
+                        return response()->json([
+                            'error' => 'Cannot delete transaction because receivable has been paid'
+                        ], 400);
+                    }
+                    $book_receivable->delete();
+                }
             }
 
             
@@ -94,11 +121,18 @@ class TransactionController extends Controller
                     'date' => $validated['transaction_date'],
                     'owner_id' => $validated['user_id'],
                     'product_id' => $validated['product_id'],
-                    'quantity' => $validated['quantity'],
+                    'in' => $validated['quantity'],
                     'purchased_in_price' => $validated['amount']/$validated['quantity'],
-                    'transaction_id' => $transaction->id
+                    'transaction_id' => $transaction->id,
+                    'qty' => $validated['quantity'],
                 ]
                 );
+
+            $transaction_inventory = TransactionInventory::create([
+                'transaction_id' => $transaction->id,
+                'inventory_id' => $book_inventory->id,
+                'quantity' => $validated['quantity']
+            ]);
             
             $invenBook = new BookInventory;
             $validate = $invenBook->checkIfHasQty($validated['user_id'], $validated['product_id']);
@@ -146,7 +180,14 @@ class TransactionController extends Controller
             $checkProduct = BookInventory::where('product_id', $validated['product_id'])
                 ->where('owner_id', $validated['user_id'])
                 ->where('deleted_at', null)
-                ->sum('quantity');
+                ->sum('in');
+            
+            $soldProduct = BookInventory::where('product_id', $validated['product_id'])
+                ->where('owner_id', $validated['user_id'])
+                ->where('deleted_at', null)
+                ->sum('out');
+
+            $checkProduct = $checkProduct - $soldProduct;
 
             $checkCustomer = new Customer;
             $checkCustomerImpl = $checkCustomer->checkCustomer($validated['customer_id'], $validated['user_id']);
@@ -165,16 +206,21 @@ class TransactionController extends Controller
                 'amount' => $validated['amount'],
                 'type' => $validated['type']
             ]);
-            $book_inventory = BookInventory::create(
-                [
-                    'date' => $validated['transaction_date'],
-                    'owner_id' => $validated['user_id'],
-                    'product_id' => $validated['product_id'],
-                    'quantity' => -$validated['quantity'],
-                    'sold_in_price' => $validated['amount']/$validated['quantity'],
-                    'transaction_id' => $transaction->id
-                ]
-                );
+            for ($i = 0; $i < $validated['quantity']; $i++) {
+                $book_inventory = BookInventory::where('product_id', $validated['product_id'])
+                    ->where('owner_id', $validated['user_id'])
+                    ->where('qty', '>', 0)
+                    ->where('deleted_at', null)
+                    ->first();
+                $book_inventory->out += 1;
+                $book_inventory->qty -= 1;
+                $book_inventory->save();
+            }
+            $transaction_inventory = TransactionInventory::create([
+                'transaction_id' => $transaction->id,
+                'inventory_id' => $book_inventory->id,
+                'quantity' => $validated['quantity']
+            ]);
             if ($validated['type'] == 4) {
                 $book_receivable = BookReceivable::create(
                     [

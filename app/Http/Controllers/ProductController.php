@@ -47,15 +47,15 @@ class ProductController extends Controller
             ->first();
             if ($item != null) {
                 // sum item qty 
-                $item->quantity = BookInventory::where('product_id', $product->id)
-                    ->where('owner_id', $userId)
-                    ->sum('quantity');
-                $item->purchased_in_price = BookInventory::where('product_id', $product->id)
-                    ->where('owner_id', $userId)
-                    ->average('purchased_in_price');
-                if ($item->quantity > 0) {
-                    array_push($res, $item);
-                }
+                $in = BookInventory::where('product_id', $product->id)
+                ->where('owner_id', $userId)
+                ->sum('in');
+                $out = BookInventory::where('product_id', $product->id)
+                ->where('owner_id', $userId)
+                ->sum('out');
+                $qty = $in - $out;
+                $product->qty = $qty;
+                array_push($res, $product);
             }
         }
 
