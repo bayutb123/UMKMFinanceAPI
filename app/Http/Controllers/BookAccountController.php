@@ -29,6 +29,14 @@ class BookAccountController extends Controller
         ], 400);
     }
 
+    public function getAccounts($userId) {
+        $accounts = BookAccount::where('owner_id', $userId)->get();
+        return response()->json([
+            'message' => 'Success',
+            'accounts' => $accounts
+        ], 200);
+    }
+
     public function updateAccountBalance(BookAccountRequest $request) {
         $validated = $request->validated();
         
