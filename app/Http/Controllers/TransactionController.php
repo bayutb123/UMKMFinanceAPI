@@ -16,6 +16,7 @@ use App\Models\Vendor;
 use App\Models\Customer;
 use App\Http\Requests\ReciptRequest;
 use App\Http\Requests\PaymentRequest;
+use App\Models\BookAccount;
 
 
 class TransactionController extends Controller
@@ -94,6 +95,14 @@ class TransactionController extends Controller
     public function createPurchaseTransaction(PurchaseRequest $request) {
         $validated = $request->validated();
         if ($validated) {
+            $cashAccount = BookAccount::where('owner_id', $validated['user_id'])
+                    ->where('name', $validated['account_name'])
+                    ->first();
+            if ($validated['type'] == 1) {
+                if ($cashAccount->balance < $validated['amount']) {
+                    return response()->json(['error' => 'Not enough balance'], 400);
+                }
+            }
             // check if product id is valid
             $checkProduct = Product::where('id', $validated['product_id'])
                 ->where('owner_id', $validated['user_id'])
@@ -155,12 +164,24 @@ class TransactionController extends Controller
                         'paid' => 0
                     ]
                 );
+                $book_account = BookAccount::where('owner_id', $validated['user_id'])
+                    ->where('name', 'Hutang')
+                    ->first();
+
+                $book_account->balance += $validated['amount'];
+                $book_account->save();
                 return response()->json([
                     'type' => 'Pembelian Kredit',
                     'transaction' => $transaction,
                     'book_inventory' => $book_inventory,
                     'book_payable' => $book_payable,
                 ]);
+            } else if ($validated['type'] == 1) {
+                $book_account = BookAccount::where('owner_id', $validated['user_id'])
+                    ->where('name', $validated['account_name'])
+                    ->first();
+                $book_account->balance -= $validated['amount'];
+                $book_account->save();
             }
             return response()->json(
                 [
@@ -176,6 +197,7 @@ class TransactionController extends Controller
     public function createSaleTransaction(SaleRequest $request) {
         $validated = $request->validated();
         if ($validated) {
+            
             // check if total of current quantity of product id is enough
             $checkProduct = BookInventory::where('product_id', $validated['product_id'])
                 ->where('owner_id', $validated['user_id'])
@@ -221,6 +243,11 @@ class TransactionController extends Controller
                 'inventory_id' => $book_inventory->id,
                 'quantity' => $validated['quantity']
             ]);
+            $book_account = BookAccount::where('owner_id', $validated['user_id'])
+                ->where('name', $validated['account_name'])
+                ->first();
+                $book_account->balance += $validated['amount'];
+                $book_account->save();
             if ($validated['type'] == 4) {
                 $book_receivable = BookReceivable::create(
                     [
@@ -232,13 +259,14 @@ class TransactionController extends Controller
                         'paid' => 0
                     ]
                 );
+
                 return response()->json([
                     'type' => 'Penjualan Kredit',
                     'transaction' => $transaction,
                     'book_inventory' => $book_inventory,
                     'book_receivable' => $book_receivable
                 ]);
-            }
+            } 
             return response()->json([
                 'type' => 'Penjualan Tunai',
                 'transaction' => $transaction,
@@ -254,11 +282,15 @@ class TransactionController extends Controller
             $book_payable = BookPayable::where('transaction_id', $validated['transaction_id'])
                 ->where('owner_id', $validated['user_id'])
                 ->first();
+            $book_account = BookAccount::where('owner_id', $validated['user_id'])
+                ->where('name', 'Hutang')
+                ->first();
 
             if ($book_payable == null) {
                 return response()->json(['error' => 'Book payable not found'], 400);
             }
 
+            $book_account->balance -= $validated['amount'];
             $book_payable->paid_amount += $validated['amount'];
             $book_payable->paid = $book_payable->paid_amount == $book_payable->amount ? 1 : 0;
 
@@ -279,6 +311,7 @@ class TransactionController extends Controller
                 'type' => $validated['type']
             ]);
 
+            $book_account->save();
             $book_payable->save();
 
             return response()->json([
@@ -294,6 +327,9 @@ class TransactionController extends Controller
     public function createReceiptTransaction(ReciptRequest $request) {
         $validated = $request->validated();
         if ($validated) {
+            $book_account = BookAccount::where('owner_id', $validated['user_id'])
+                ->where('name', 'Piutang')
+                ->first();
             $book_receivable = BookReceivable::where('transaction_id', $validated['transaction_id'])
                 ->where('owner_id', $validated['user_id'])
                 ->first();
@@ -301,7 +337,7 @@ class TransactionController extends Controller
             if ($book_receivable == null) {
                 return response()->json(['error' => 'Book receivable not found'], 400);
             }
-
+            $book_account->balance -= $validated['amount'];
             $book_receivable->paid_amount += $validated['amount'];
             $book_receivable->paid = $book_receivable->paid_amount == $book_receivable->amount ? 1 : 0;
 
@@ -322,6 +358,7 @@ class TransactionController extends Controller
                 'type' => $validated['type']
             ]);
 
+            $book_account->save();
             $book_receivable->save();
 
             return response()->json([
