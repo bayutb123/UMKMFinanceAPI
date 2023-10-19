@@ -59,4 +59,28 @@ class BookAccountController extends Controller
         ], 400);
     }
 
+    public function deleteAccount($id) {
+        $account = BookAccount::where('id', $id)->first();
+    
+        if ($account != null && $account->is_default == false) {
+            if ($account->balance == 0) {
+                $account->delete();
+                return response()->json([
+                    'message' => 'Success',
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Failed',
+                    'error' => 'Account balance is not 0'
+                ], 400);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Failed',
+            'error' => 'Account not found or is default account'
+        ], 400);
+
+    }
+
 }

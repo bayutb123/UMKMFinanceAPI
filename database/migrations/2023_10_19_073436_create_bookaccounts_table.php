@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('type');
             $table->string('currency')->default('IDR');
             $table->decimal('balance', 15, 2)->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
             $table->softDeletes();
 

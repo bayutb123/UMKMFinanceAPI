@@ -70,7 +70,7 @@ class AuthController extends Controller
                     'type' => $initial[2],
                     'currency' => $initial[3],
                     'balance' => $initial[4],
-                    'is_active' => $initial[5],
+                    'is_default' => $initial[5],
                 ]);
             }
 

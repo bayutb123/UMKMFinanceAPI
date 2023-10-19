@@ -16,7 +16,7 @@ class BookAccount extends Model
         'type',
         'currency',
         'balance',
-        'is_active'
+        'is_default'
     ];
 
 }

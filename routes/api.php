@@ -36,6 +36,7 @@ Route::delete('/product/delete/{id}', [ProductController::class, 'deleteProduct'
 Route::post('/account/add', [BookAccountController::class, 'addAccountRecord']);
 Route::post('/account/balance/update', [BookAccountController::class, 'updateAccountBalance']);
 Route::get('/accounts/{id}', [BookAccountController::class, 'getAccounts']);
+Route::delete('/account/delete/{id}', [BookAccountController::class, 'deleteAccount']);
 
 Route::get('/finance/today/{id}', [FinancialController::class, 'getTodayTransactions']);
 Route::get('/finance/current-month/{id}', [FinancialController::class, 'getCurrentMonthTransactions']);
