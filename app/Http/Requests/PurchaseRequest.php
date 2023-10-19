@@ -31,6 +31,7 @@ class PurchaseRequest extends FormRequest
             'quantity' => 'required|numeric',
             'amount' => 'required|numeric',
             'type' => 'required|integer',
+            'account_name' => 'string',
         ];
     }
 }

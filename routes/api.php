@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FinancialController;
+use App\Http\Controllers\BookAccountController;
 
 
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -32,6 +33,8 @@ Route::delete('/customer/delete/{id}', [CustomerController::class, 'deleteCustom
 Route::post('/product/add', [ProductController::class, 'addProduct']);
 Route::get('/product/get/{id}', [ProductController::class, 'getProducts']);
 Route::delete('/product/delete/{id}', [ProductController::class, 'deleteProduct']);
+Route::post('/account/add', [BookAccountController::class, 'addAccountRecord']);
+Route::post('/account/balance/update', [BookAccountController::class, 'updateAccountBalance']);
 
 Route::get('/finance/today/{id}', [FinancialController::class, 'getTodayTransactions']);
 Route::get('/finance/current-month/{id}', [FinancialController::class, 'getCurrentMonthTransactions']);
